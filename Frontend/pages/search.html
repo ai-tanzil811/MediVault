@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Medicines - MediVault</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="/" class="logo">💊 MediVault</a>
+            <nav id="user-menu"></nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="padding: 2rem 0;">
+            <h1>Browse Medicines</h1>
+
+            <div class="card">
+                <div class="form-group">
+                    <label for="search-input">Search by name, brand, or category</label>
+                    <input type="text" id="search-input" placeholder="Search medicines..." style="font-size: 1.1rem; padding: 0.75rem;">
+                </div>
+            </div>
+
+            <div id="medicines-grid" class="grid grid-3">
+                <!-- Medicines will be loaded here -->
+            </div>
+
+            <div id="pagination" class="flex-center gap-2" style="margin-top: 2rem;">
+                <!-- Pagination buttons will be here -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MediVault. Local Dispensary Management System.</p>
+    </footer>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script src="/Frontend/scripts/api.js"></script>
+    <script src="/Frontend/scripts/auth.js"></script>
+
+    <script>
+        let currentPage = 1;
+        let currentSearch = '';
+
+        async function loadMedicines(page = 1, search = '') {
+            try {
+                const response = search
+                    ? await API.searchMedicines(search, page)
+                    : await API.getMedicines(page);
+
+                if (response.success) {
+                    displayMedicines(response.data);
+                    displayPagination(response.pagination, search);
+                }
+            } catch (error) {
+                Utils.showNotification('Failed to load medicines', 'error');
+            }
+        }
+
+        function displayMedicines(medicines) {
+            const grid = document.getElementById('medicines-grid');
+
+            if (medicines.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1;">No medicines found</p>';
+                return;
+            }
+
+            grid.innerHTML = medicines.map(med => `
+                <div class="card">
+                    <h3>${med.name}</h3>
+                    <p><strong>Brand:</strong> ${med.brand}</p>
+                    <p><strong>Category:</strong> ${med.category}</p>
+                    <p><strong>Price:</strong> ${Utils.formatCurrency(med.price)}</p>
+                    <p>
+                        <strong>Stock:</strong>
+                        <span class="badge ${med.stock_level > 0 ? 'badge-success' : 'badge-danger'}">
+                            ${med.stock_level > 0 ? `${med.stock_level} in stock` : 'Out of stock'}
+                        </span>
+                    </p>
+                    ${med.prescription_required ? '<p><span class="badge badge-warning">Requires Prescription</span></p>' : ''}
+                    <button class="btn btn-primary" onclick="addToCart(${med.med_id})" ${med.stock_level === 0 ? 'disabled' : ''}>
+                        ${med.stock_level === 0 ? 'Out of Stock' : 'Add to Cart'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function displayPagination(pagination, search) {
+            const container = document.getElementById('pagination');
+            let html = '';
+
+            // Previous button
+            if (pagination.page > 1) {
+                html += `<button class="btn btn-outline" onclick="goToPage(${pagination.page - 1}, '${search}')">← Previous</button>`;
+            }
+
+            // Page info
+            html += `<span>Page ${pagination.page} of ${pagination.pages}</span>`;
+
+            // Next button
+            if (pagination.page < pagination.pages) {
+                html += `<button class="btn btn-outline" onclick="goToPage(${pagination.page + 1}, '${search}')">Next →</button>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function goToPage(page, search = '') {
+            currentPage = page;
+            currentSearch = search;
+            loadMedicines(page, search);
+            window.scrollTo(0, 0);
+        }
+
+        async function addToCart(medId) {
+            if (!Utils.isLoggedIn()) {
+                Utils.showNotification('Please login to add items to cart', 'error');
+                window.location.href = '/Frontend/pages/login.html';
+                return;
+            }
+
+            try {
+                await Cart.addToCart(medId, 1);
+                Utils.showNotification('Item added to cart!', 'success');
+            } catch (error) {
+                Utils.showNotification('Failed to add item to cart', 'error');
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            currentSearch = query;
+            currentPage = 1;
+
+            if (query.length > 0) {
+                loadMedicines(1, query);
+            } else {
+                loadMedicines(1, '');
+            }
+        });
+
+        // Load medicines on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMedicines();
+        });
+    </script>
+</body>
+</html>

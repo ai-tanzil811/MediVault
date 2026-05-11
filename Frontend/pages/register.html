@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MediVault</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="/" class="logo">💊 MediVault</a>
+            <nav id="user-menu"></nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container flex-center" style="min-height: calc(100vh - 200px); padding: 2rem 0;">
+            <div class="card" style="max-width: 500px; width: 100%;">
+                <div class="card-header text-center">Create Account</div>
+
+                <form id="register-form">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" required placeholder="25" min="18" max="120">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nid">National ID (NID)</label>
+                        <input type="text" id="nid" name="nid" required placeholder="12345678901">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Min 8 chars, 1 uppercase, 1 number">
+                        <small>Must be at least 8 characters, include uppercase and numbers</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo">Profile Photo (Optional)</label>
+                        <input type="file" id="photo" name="photo" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                </form>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p>Already have an account? <a href="/Frontend/pages/login.html">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MediVault. Local Dispensary Management System.</p>
+    </footer>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script src="/Frontend/scripts/api.js"></script>
+    <script src="/Frontend/scripts/auth.js"></script>
+
+    <script>
+        Auth.redirectIfAuthenticated();
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const nid = document.getElementById('nid').value;
+            const age = document.getElementById('age').value;
+            const photoFile = document.getElementById('photo').files[0];
+
+            // Validate
+            if (name.length < 2) {
+                Utils.showNotification('Name must be at least 2 characters', 'error');
+                return;
+            }
+
+            if (!Utils.validateEmail(email)) {
+                Utils.showNotification('Invalid email format', 'error');
+                return;
+            }
+
+            if (!Utils.validatePassword(password)) {
+                Utils.showNotification('Password must be at least 8 characters with uppercase and numbers', 'error');
+                return;
+            }
+
+            if (!Utils.validateNID(nid)) {
+                Utils.showNotification('Invalid NID format', 'error');
+                return;
+            }
+
+            if (!Utils.validateAge(age)) {
+                Utils.showNotification('Age must be between 18 and 120', 'error');
+                return;
+            }
+
+            try {
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Registering...';
+
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('password', password);
+                formData.append('nid', nid);
+                formData.append('age', age);
+                if (photoFile) {
+                    formData.append('photo', photoFile);
+                }
+
+                // Convert FormData to JSON for API
+                const data = {
+                    name, email, password, nid, age: parseInt(age)
+                };
+
+                const response = await API.register(data);
+
+                if (response.success) {
+                    Utils.setToken(response.data.token);
+                    Utils.setUser(response.data);
+                    Utils.showNotification('Registration successful! Redirecting...', 'success', 2000);
+
+                    setTimeout(() => {
+                        window.location.href = '/Frontend/pages/dashboard.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                Utils.showNotification('Registration failed. Please try again.', 'error');
+                document.querySelector('button[type="submit"]').disabled = false;
+                document.querySelector('button[type="submit"]').textContent = 'Register';
+            }
+        });
+    </script>
+</body>
+</html>

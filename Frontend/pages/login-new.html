@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MediVault</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+    <style>
+        :root {
+            --primary-blue: #003f87;
+            --dark-text: #191c1e;
+        }
+
+        body {
+            background: #f9f9ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .login-container {
+            background: #f2f3fc;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(25,28,33,0.05);
+            overflow: hidden;
+            max-width: 1024px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            min-height: 857px;
+        }
+
+        /* Left Panel - Branding */
+        .login-left {
+            background: var(--primary-blue);
+            background: linear-gradient(116.47deg, #003f87 0%, #005eb3 100%);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            color: white;
+        }
+
+        .login-left::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><defs><pattern id="pattern" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect fill="url(%23pattern)" width="100%" height="100%"/></svg>');
+            opacity: 0.2;
+            mix-blend-mode: overlay;
+        }
+
+        .login-left > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .login-logo span {
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .login-logo h2 {
+            font-size: 24px;
+            font-weight: 900;
+            margin: 0;
+        }
+
+        .login-heading {
+            margin: 16px 0 0;
+        }
+
+        .login-heading h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 0;
+            line-height: 45px;
+            letter-spacing: -0.9px;
+        }
+
+        .login-description {
+            margin-top: 24px;
+            font-size: 18px;
+            line-height: 29.25px;
+            opacity: 0.8;
+            max-width: 320px;
+        }
+
+        .login-trust-items {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .trust-item {
+            display: flex;
+            gap: 16px;
+        }
+
+        .trust-item-icon {
+            width: 32px;
+            height: 36px;
+            flex-shrink: 0;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+        }
+
+        .trust-item-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.35px;
+            margin: 0 0 4px;
+        }
+
+        .trust-item-content p {
+            font-size: 12px;
+            opacity: 0.7;
+            margin: 0;
+        }
+
+        /* Right Panel - Login Form */
+        .login-right {
+            background: white;
+            padding: 64px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-right h2 {
+            font-size: 30px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin: 0 0 8px;
+            letter-spacing: -0.75px;
+        }
+
+        .login-right > p {
+            color: #424752;
+            font-size: 16px;
+            margin: 0 0 40px;
+        }
+
+        /* Role Selector */
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .role-card {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 26px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .role-card.user {
+            background: rgba(0,63,135,0.05);
+            border-color: var(--primary-blue);
+        }
+
+        .role-card.admin {
+            background: #f2f3fc;
+            border-color: transparent;
+        }
+
+        .role-card input[type="radio"] {
+            position: absolute;
+            right: 18px;
+            top: 22px;
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+
+        .role-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .role-card.user .role-icon {
+            background: rgba(0,110,37,0.1);
+        }
+
+        .role-card.admin .role-icon {
+            background: rgba(0,63,135,0.1);
+        }
+
+        .role-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 12px 0 4px;
+            color: var(--dark-text);
+        }
+
+        .role-card p {
+            font-size: 14px;
+            color: #424752;
+            margin: 0;
+        }
+
+        /* Login Form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 8px;
+            left: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #424752;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            z-index: 1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 18px 16px 18px 48px;
+            border: none;
+            border-radius: 8px;
+            background: #e1e2ea;
+            font-size: 16px;
+            color: #727784;
+            margin-top: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input::placeholder {
+            color: #727784;
+        }
+
+        .form-group-icon {
+            position: absolute;
+            left: 18px;
+            top: 42px;
+            width: 16px;
+            font-size: 16px;
+            z-index: 2;
+        }
+
+        /* Remember & Forgot */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            cursor: pointer;
+            color: #424752;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .forgot-password {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        /* Login Button */
+        .login-btn {
+            background: linear-gradient(to right, #003f87, #0056b3);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(0,63,135,0.2);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -3px rgba(0,63,135,0.3);
+        }
+
+        /* Footer Help */
+        .login-footer {
+            border-top: 1px solid rgba(194,198,212,0.1);
+            padding-top: 33px;
+            text-align: center;
+            font-size: 12px;
+            color: #424752;
+        }
+
+        .login-footer::before {
+            content: 'ℹ️';
+            margin-right: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+
+            .login-left {
+                display: none;
+            }
+
+            .login-right {
+                padding: 48px 24px;
+            }
+
+            .role-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Panel -->
+        <div class="login-left">
+            <div>
+                <div class="login-logo">
+                    <span>💊</span>
+                    <h2>MediVault</h2>
+                </div>
+                <div class="login-heading">
+                    <h1>The Clinical<br>Sanctuary.</h1>
+                </div>
+                <p class="login-description">
+                    Secure pharmaceutical management and patient record access for the modern practitioner.
+                </p>
+            </div>
+
+            <div class="login-trust-items">
+                <div class="trust-item">
+                    <div class="trust-item-icon">🔒</div>
+                    <div class="trust-item-content">
+                        <h4>HIPAA Compliant</h4>
+                        <p>Fully certified medical security</p>
+                    </div>
+                </div>
+
+                <div class="trust-item">
+                    <div class="trust-item-icon">🔐</div>
+                    <div class="trust-item-content">
+                        <h4>AES-256 Encrypted</h4>
+                        <p>Bank-grade vault protection</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="login-right">
+            <h2>Welcome back</h2>
+            <p>Select your workspace access level to continue</p>
+
+            <!-- Role Selection -->
+            <div class="role-selector">
+                <label class="role-card user">
+                    <input type="radio" name="role" value="user" checked>
+                    <div class="role-icon">👤</div>
+                    <h3>User</h3>
+                    <p>Standard Clinical Access</p>
+                </label>
+
+                <label class="role-card admin">
+                    <input type="radio" name="role" value="admin">
+                    <div class="role-icon">⚙️</div>
+                    <h3>Administrator</h3>
+                    <p>Full System Governance</p>
+                </label>
+            </div>
+
+            <!-- Login Form -->
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="email">Clinical ID</label>
+                    <input type="email" id="email" name="email" placeholder="MV-4429-XXXX" required>
+                    <div class="form-group-icon">📋</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Vault Passcode</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <div class="form-group-icon">🔑</div>
+                </div>
+
+                <!-- Remember & Forgot -->
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember terminal</label>
+                    </div>
+                    <a href="/Frontend/pages/forgot-password.html" class="forgot-password">Forgot access?</a>
+                </div>
+
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+
+            <!-- Footer Help -->
+            <div class="login-footer">
+                Authorized medical personnel only. Session logging is active.
+            </div>
+        </div>
+    </div>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script src="/Frontend/scripts/api.js"></script>
+    <script src="/Frontend/scripts/auth.js"></script>
+
+    <script>
+        Auth.redirectIfAuthenticated();
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+
+            if (!email || !password) {
+                Utils.showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const submitBtn = document.querySelector('.login-btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Signing in...';
+
+                await Auth.handleLogin(email, password);
+            } catch (error) {
+                Utils.showNotification('Login failed: Invalid credentials', 'error');
+                document.querySelector('.login-btn').disabled = false;
+                document.querySelector('.login-btn').textContent = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

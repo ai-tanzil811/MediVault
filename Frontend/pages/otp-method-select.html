@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Verification Method - MediVault</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+    <style>
+        :root {
+            --primary-blue: #003f87;
+            --dark-text: #191c1e;
+        }
+
+        body {
+            background: #f9f9ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 60px 48px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .auth-logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin: 0 0 8px;
+            letter-spacing: -0.7px;
+        }
+
+        .auth-header p {
+            color: #424752;
+            font-size: 16px;
+            margin: 0;
+            line-height: 24px;
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .method-card {
+            border: 2px solid #e1e2ea;
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .method-card:hover {
+            border-color: var(--primary-blue);
+            background: #f9f9ff;
+        }
+
+        .method-card input[type="radio"] {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .method-card.selected {
+            border-color: var(--primary-blue);
+            background: rgba(0, 63, 135, 0.02);
+        }
+
+        .method-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .method-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin: 0 0 8px;
+        }
+
+        .method-card p {
+            font-size: 14px;
+            color: #424752;
+            margin: 0 0 8px;
+            line-height: 20px;
+        }
+
+        .method-info {
+            font-size: 13px;
+            color: #727784;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #003f87, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 63, 135, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e1e2ea;
+        }
+
+        .back-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 40px 24px;
+            }
+
+            .auth-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">📲</div>
+            <h1>Verify Your Identity</h1>
+            <p>Choose how you'd like to receive your verification code</p>
+        </div>
+
+        <form id="method-form">
+            <div class="methods-grid">
+                <!-- Email Option -->
+                <label class="method-card">
+                    <input type="radio" name="method" value="email" required>
+                    <div class="method-icon">📧</div>
+                    <h3>Email Verification</h3>
+                    <p>Receive a 6-digit code via email</p>
+                    <div class="method-info" id="email-info">
+                        Code will be sent to: <strong id="email-address">your@email.com</strong>
+                    </div>
+                </label>
+
+                <!-- SMS Option -->
+                <label class="method-card">
+                    <input type="radio" name="method" value="sms">
+                    <div class="method-icon">💬</div>
+                    <h3>SMS Verification</h3>
+                    <p>Receive a 6-digit code via text message</p>
+                    <div class="method-info" id="sms-info">
+                        Code will be sent to: <strong id="phone-number">+1 (XXX) XXX-XXXX</strong>
+                    </div>
+                </label>
+
+                <!-- Authenticator App Option -->
+                <label class="method-card">
+                    <input type="radio" name="method" value="authenticator">
+                    <div class="method-icon">🔐</div>
+                    <h3>Authenticator App</h3>
+                    <p>Use your authenticator app (Google Authenticator, Authy, etc.)</p>
+                    <div class="method-info">
+                        For maximum security with MediVault
+                    </div>
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn">Continue</button>
+        </form>
+
+        <div class="back-link">
+            <a href="/Frontend/pages/forgot-password.html">← Back</a>
+        </div>
+    </div>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script>
+        const methodCards = document.querySelectorAll('.method-card');
+        const methodForm = document.getElementById('method-form');
+
+        // Pre-select email as default
+        document.querySelector('input[name="method"][value="email"]').checked = true;
+        methodCards[0].classList.add('selected');
+
+        // Update visual selection
+        methodCards.forEach(card => {
+            card.addEventListener('click', () => {
+                methodCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+
+        // Form submission
+        methodForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const method = document.querySelector('input[name="method"]:checked').value;
+
+            try {
+                const btn = document.querySelector('.submit-btn');
+                btn.disabled = true;
+                btn.textContent = 'Sending verification code...';
+
+                // Store the selected method for next step
+                sessionStorage.setItem('verification_method', method);
+
+                Utils.showNotification(`Sending verification code via ${method}...`, 'success');
+
+                // Simulate sending code (in production, call backend API)
+                setTimeout(() => {
+                    window.location.href = '/Frontend/pages/otp-verification.html';
+                }, 1500);
+
+            } catch (error) {
+                Utils.showNotification('Failed to send verification code', 'error');
+                document.querySelector('.submit-btn').disabled = false;
+                document.querySelector('.submit-btn').textContent = 'Continue';
+            }
+        });
+
+        // In production, fetch user's email and phone from backend
+        // For now, using placeholder values
+        document.getElementById('email-address').textContent = sessionStorage.getItem('user_email') || 'your@email.com';
+        document.getElementById('phone-number').textContent = sessionStorage.getItem('user_phone') || '+1 (XXX) XXX-XXXX';
+    </script>
+</body>
+</html>

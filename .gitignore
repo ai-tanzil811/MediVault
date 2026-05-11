@@ -1,0 +1,15 @@
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Server/data/uploads/*
+!Server/data/uploads/.gitkeep
+node_modules/
+vendor/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cache/

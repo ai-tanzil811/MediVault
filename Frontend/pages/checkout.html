@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MediVault</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="/" class="logo">💊 MediVault</a>
+            <nav id="user-menu"></nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="padding: 2rem 0;">
+            <h1>Checkout</h1>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">Order Summary</div>
+                    <div id="order-summary">
+                        <!-- Items will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Prescription Upload</div>
+                    <div id="prescription-section">
+                        <!-- Will be shown if prescription required -->
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <button id="place-order-btn" class="btn btn-primary" style="width: 100%;" onclick="placeOrder()">
+                            Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="order-success" class="alert alert-success hidden" style="margin-top: 2rem;">
+                <strong>Order Placed Successfully!</strong>
+                <p>Your order ID: <strong id="order-id"></strong></p>
+                <p>Status: <span id="order-status"></span></p>
+                <a href="/Frontend/pages/order-history.html" class="btn btn-primary" style="margin-top: 1rem;">View Orders</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MediVault. Local Dispensary Management System.</p>
+    </footer>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script src="/Frontend/scripts/api.js"></script>
+    <script src="/Frontend/scripts/auth.js"></script>
+    <script src="/Frontend/scripts/cart.js"></script>
+
+    <script>
+        Auth.redirectIfNotAuthenticated();
+
+        let requiresPrescription = false;
+        let orderId = null;
+
+        async function loadCheckoutData() {
+            try {
+                orderId = localStorage.getItem('checkout_order_id');
+                if (!orderId) {
+                    window.location.href = '/Frontend/pages/cart.html';
+                    return;
+                }
+
+                const order = await API.getOrder(orderId);
+
+                if (order.success) {
+                    displayOrderSummary(order.data);
+
+                    // Check if any item requires prescription
+                    checkPrescriptionRequirement(order.data.items);
+                }
+            } catch (error) {
+                Utils.showNotification('Failed to load order', 'error');
+                window.location.href = '/Frontend/pages/cart.html';
+            }
+        }
+
+        function displayOrderSummary(order) {
+            const summary = document.getElementById('order-summary');
+            let html = '<table><thead><tr><th>Medicine</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>';
+
+            order.items.forEach(item => {
+                const total = (item.price * item.quantity).toFixed(2);
+                html += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${Utils.formatCurrency(item.price)}</td>
+                        <td>${Utils.formatCurrency(total)}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            html += `<div style="margin-top: 1rem; text-align: right;"><strong>Total: ${Utils.formatCurrency(order.total)}</strong></div>`;
+
+            summary.innerHTML = html;
+        }
+
+        function checkPrescriptionRequirement(items) {
+            // In a real implementation, check if any item requires prescription
+            // For now, we'll assume if user has items with prescription_required field set
+            requiresPrescription = items.some(item => item.prescription_required);
+
+            const prescSection = document.getElementById('prescription-section');
+
+            if (requiresPrescription) {
+                prescSection.innerHTML = `
+                    <p class="alert alert-warning">
+                        <strong>⚠️ Important:</strong> Some items in your order require a valid prescription.
+                    </p>
+                    <div class="form-group">
+                        <label for="prescription-file">Upload Prescription Image (JPEG/PNG)</label>
+                        <input type="file" id="prescription-file" name="prescription" accept="image/jpeg,image/png" required>
+                        <small>Max size: 5MB. Must be a clear photo of your prescription.</small>
+                    </div>
+                    <div id="file-preview"></div>
+                `;
+
+                // Handle file preview
+                document.getElementById('prescription-file').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            document.getElementById('file-preview').innerHTML = `
+                                <img src="${event.target.result}" style="max-width: 200px; margin-top: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            } else {
+                prescSection.innerHTML = '<p class="alert alert-success">✓ No prescription required for this order</p>';
+            }
+        }
+
+        async function placeOrder() {
+            const btn = document.getElementById('place-order-btn');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
+            try {
+                let formData = new FormData();
+                formData.append('order_id', orderId);
+
+                if (requiresPrescription) {
+                    const prescFile = document.getElementById('prescription-file');
+                    if (!prescFile.files[0]) {
+                        Utils.showNotification('Please upload a prescription image', 'error');
+                        btn.disabled = false;
+                        btn.textContent = 'Place Order';
+                        return;
+                    }
+
+                    // Validate file
+                    const file = prescFile.files[0];
+                    if (file.size > 5242880) {
+                        Utils.showNotification('File size exceeds 5MB limit', 'error');
+                        btn.disabled = false;
+                        btn.textContent = 'Place Order';
+                        return;
+                    }
+
+                    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                        Utils.showNotification('Only JPEG and PNG files are allowed', 'error');
+                        btn.disabled = false;
+                        btn.textContent = 'Place Order';
+                        return;
+                    }
+
+                    formData.append('prescription', file);
+                }
+
+                // Make the checkout request
+                const token = Utils.getToken();
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch(API.BASE_URL + '/orders/checkout.php', {
+                    method: 'POST',
+                    headers,
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Clear checkout order ID
+                    localStorage.removeItem('checkout_order_id');
+
+                    // Show success message
+                    document.querySelector('.card').style.display = 'none';
+                    const successDiv = document.getElementById('order-success');
+                    successDiv.classList.remove('hidden');
+                    document.getElementById('order-id').textContent = result.data.order_id;
+                    document.getElementById('order-status').textContent = result.data.status;
+
+                    Utils.showNotification('Order placed successfully!', 'success');
+                } else {
+                    Utils.showNotification(result.error || 'Failed to place order', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Place Order';
+                }
+            } catch (error) {
+                Utils.showNotification('Error placing order: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Place Order';
+            }
+        }
+
+        // Load checkout data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCheckoutData();
+        });
+    </script>
+</body>
+</html>

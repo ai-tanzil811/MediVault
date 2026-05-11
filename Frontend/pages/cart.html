@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - MediVault</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="/" class="logo">💊 MediVault</a>
+            <nav id="user-menu"></nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="padding: 2rem 0;">
+            <h1>Shopping Cart</h1>
+
+            <!-- CRITICAL: Drug Conflict Warnings -->
+            <div id="conflict-warnings"></div>
+
+            <div class="card">
+                <div id="cart-items">
+                    <!-- Cart items will be loaded here -->
+                </div>
+
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #d1d5db;">
+                    <div class="flex-between" style="font-size: 1.25rem; margin-bottom: 1.5rem;">
+                        <strong>Cart Total:</strong>
+                        <strong id="cart-total">$0.00</strong>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <a href="/Frontend/pages/search.html" class="btn btn-outline">Continue Shopping</a>
+                        <button id="checkout-btn" class="btn btn-primary" onclick="goToCheckout()">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MediVault. Local Dispensary Management System.</p>
+    </footer>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script src="/Frontend/scripts/api.js"></script>
+    <script src="/Frontend/scripts/auth.js"></script>
+    <script src="/Frontend/scripts/cart.js"></script>
+
+    <script>
+        Auth.redirectIfNotAuthenticated();
+
+        async function loadCart() {
+            try {
+                await Cart.loadCart();
+                displayCart();
+            } catch (error) {
+                Utils.showNotification('Failed to load cart', 'error');
+            }
+        }
+
+        function displayCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+
+            if (!Cart.currentCart || Cart.currentCart.items.length === 0) {
+                cartItems.innerHTML = '<p>Your cart is empty</p>';
+                cartTotal.textContent = '$0.00';
+                document.getElementById('checkout-btn').disabled = true;
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Medicine</th><th>Brand</th><th>Price</th><th>Quantity</th><th>Total</th><th>Action</th></tr></thead><tbody>';
+
+            Cart.currentCart.items.forEach(item => {
+                const total = (item.price * item.quantity).toFixed(2);
+                html += `
+                    <tr>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.brand}</td>
+                        <td>${Utils.formatCurrency(item.price)}</td>
+                        <td>${item.quantity}</td>
+                        <td>${Utils.formatCurrency(total)}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="removeItem(${item.order_item_id})">Remove</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            cartItems.innerHTML = html;
+            cartTotal.textContent = Utils.formatCurrency(Cart.currentCart.cart_total);
+
+            // Enable/disable checkout button based on conflicts
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (Cart.hasConflicts()) {
+                checkoutBtn.disabled = true;
+                checkoutBtn.title = 'Please resolve conflicts before checkout';
+            } else {
+                checkoutBtn.disabled = false;
+                checkoutBtn.title = '';
+            }
+        }
+
+        async function removeItem(itemId) {
+            if (confirm('Remove this item from cart?')) {
+                await Cart.removeFromCart(itemId);
+                displayCart();
+            }
+        }
+
+        function goToCheckout() {
+            if (Cart.hasConflicts()) {
+                Utils.showNotification('Please resolve conflicts before checkout', 'error');
+                return;
+            }
+
+            // Store order ID for checkout page
+            localStorage.setItem('checkout_order_id', Cart.currentCart.order_id);
+            window.location.href = '/Frontend/pages/checkout.html';
+        }
+
+        // Load cart on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+        });
+    </script>
+</body>
+</html>

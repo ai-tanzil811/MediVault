@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVault - The Digital Vault for Clinical Care</title>
+    <link rel="stylesheet" href="/Frontend/styles/main.css">
+    <link rel="stylesheet" href="/Frontend/styles/responsive.css">
+    <style>
+        /* Custom styles for Figma-inspired design */
+        :root {
+            --primary-blue: #003f87;
+            --accent-green: #006e25;
+            --accent-red: #88001c;
+            --light-blue-bg: #f2f3fc;
+            --dark-text: #191c1e;
+        }
+
+        .hero-section {
+            background: var(--light-bg);
+            padding: 128px 96px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .hero-content h1 {
+            font-size: 72px;
+            font-weight: 800;
+            line-height: 72px;
+            color: var(--dark-text);
+            margin-bottom: 24px;
+            letter-spacing: -3.6px;
+        }
+
+        .hero-content h1 .highlight {
+            color: var(--primary-blue);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #8df7c1;
+            color: var(--accent-green);
+            padding: 4px 12px;
+            border-radius: 2px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 24px;
+        }
+
+        .hero-description {
+            font-size: 20px;
+            color: #424752;
+            line-height: 28px;
+            margin-bottom: 32px;
+            max-width: 512px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: var(--light-blue-bg);
+            padding: 128px 96px;
+        }
+
+        .features-container {
+            max-width: 1536px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-header h2 {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--dark-text);
+            margin-bottom: 16px;
+            letter-spacing: -1.8px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: #424752;
+            max-width: 768px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .feature-card.critical {
+            background: var(--accent-red);
+            color: white;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .feature-card.critical::before {
+            content: "Life Critical";
+            position: absolute;
+            top: 13px;
+            right: 16px;
+            background: rgba(255,255,255,0.2);
+            padding: 2.5px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 32px;
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            background: #d7e2ff;
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            background: #83fc8e;
+        }
+
+        .feature-card.critical .feature-icon {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 16px 0;
+            letter-spacing: -0.6px;
+        }
+
+        .feature-card p {
+            font-size: 16px;
+            line-height: 26px;
+            color: #424752;
+            margin-bottom: 16px;
+        }
+
+        .feature-card.critical p {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .feature-divider {
+            height: 4px;
+            width: 48px;
+            margin-top: 16px;
+        }
+
+        .feature-card:nth-child(1) .feature-divider {
+            background: #003f87;
+        }
+
+        .feature-card:nth-child(2) .feature-divider {
+            background: var(--accent-green);
+        }
+
+        .feature-card.critical .feature-divider {
+            background: white;
+        }
+
+        /* Prescription Security Section */
+        .security-section {
+            background: var(--light-bg);
+            padding: 128px 96px;
+        }
+
+        .security-container {
+            max-width: 1536px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .security-content h2 {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--dark-text);
+            margin-bottom: 32px;
+            letter-spacing: -1.8px;
+        }
+
+        .security-content p {
+            font-size: 18px;
+            color: #424752;
+            line-height: 29.25px;
+            margin-bottom: 32px;
+        }
+
+        .security-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .security-item-icon {
+            width: 32px;
+            height: 36px;
+            background: var(--primary-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .security-item-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 8px;
+        }
+
+        .security-item-content p {
+            font-size: 14px;
+            color: #424752;
+            margin: 0;
+            line-height: 20px;
+        }
+
+        .security-image {
+            background: #e7e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .security-image img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Trust Markers */
+        .trust-section {
+            background: #e7e8f0;
+            padding: 80px 96px;
+        }
+
+        .trust-container {
+            max-width: 1536px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            gap: 100px;
+        }
+
+        .trust-marker {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .trust-icon {
+            width: 27px;
+            height: 33px;
+            flex-shrink: 0;
+        }
+
+        .trust-content h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark-text);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .trust-content p {
+            font-size: 12px;
+            font-weight: 600;
+            color: #424752;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        /* Navigation */
+        .top-nav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            backdrop-filter: blur(12px);
+            background: rgba(248,250,252,0.8);
+            padding: 12px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .top-nav .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e3a8a;
+            letter-spacing: -1.2px;
+        }
+
+        .top-nav .nav-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .top-nav .btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .top-nav .btn-signin {
+            background: transparent;
+            color: #475569;
+        }
+
+        .top-nav .btn-register {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-grid, .security-container {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero-section, .features-section, .security-section {
+                padding: 64px 48px;
+            }
+
+            .hero-content h1 {
+                font-size: 48px;
+                line-height: 48px;
+            }
+
+            .trust-container {
+                flex-direction: column;
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content h1 {
+                font-size: 36px;
+                line-height: 36px;
+            }
+
+            .features-section h2 {
+                font-size: 28px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+
+            .hero-cta .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="logo">MediVault</div>
+        <div class="nav-buttons">
+            <button class="btn btn-signin">Sign In</button>
+            <button class="btn btn-register">Register</button>
+        </div>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-grid">
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1576091160550-112173f7f869?w=576&h=576&fit=crop" alt="Modern Medical Facility">
+                </div>
+                <div class="hero-content">
+                    <span class="hero-badge">Trusted Clinical Network</span>
+                    <h1>The Digital Vault <span class="highlight">for Clinical Care.</span></h1>
+                    <p class="hero-description">Streamlining medication management with high-security architectural integrity and real-time interaction safety protocols.</p>
+                    <div class="hero-cta">
+                        <button class="btn btn-primary" onclick="window.location.href='/Frontend/pages/login.html'">User login →</button>
+                        <button class="btn btn-outline" onclick="window.location.href='/Frontend/pages/login.html'">Admin login →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="features-container">
+                <div class="section-header">
+                    <h2>Precision Tools for Modern Practitioners</h2>
+                    <p>Beyond a simple database, MediVault provides a sanctuary of clinical intelligence.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Smart Inventory</h3>
+                        <p>Advanced admin tools for stock management, automated expiry tracking, and real-time replenishment alerts tailored for university clinics.</p>
+                        <div class="feature-divider"></div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3>Safe Search</h3>
+                        <p>Intelligent search protocol allows lookup by drug name or symptom, ensuring practitioners find the right medication with semantic accuracy.</p>
+                        <div class="feature-divider"></div>
+                    </div>
+
+                    <div class="feature-card critical">
+                        <div class="feature-icon">⚠️</div>
+                        <h3>Clinical Safety</h3>
+                        <p>Our proprietary real-time conflict warning system scans for potential drug-to-drug interactions instantly upon patient record matching.</p>
+                        <div class="feature-divider"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prescription Security Section -->
+        <section class="security-section">
+            <div class="security-container">
+                <div class="security-content">
+                    <h2>Secure Upload for Restricted Medications</h2>
+                    <p>Maintain 100% compliance with federal and state regulations for schedule-controlled substances. Our encrypted portal handles restricted uploads with clinical precision.</p>
+
+                    <div class="security-item">
+                        <div class="security-item-icon">🔒</div>
+                        <div class="security-item-content">
+                            <h4>End-to-End Encryption</h4>
+                            <p>Sensitive prescription data is encrypted before it leaves your terminal.</p>
+                        </div>
+                    </div>
+
+                    <div class="security-item">
+                        <div class="security-item-icon">✓</div>
+                        <div class="security-item-content">
+                            <h4>Multi-Auth Verification</h4>
+                            <p>Dual-practitioner sign-off for high-risk medication dispersal.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="security-image">
+                    <img src="https://images.unsplash.com/photo-1576091160732-8b64e5ca90e0?w=472&h=472&fit=crop" alt="Secure Medical Dashboard">
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Markers -->
+        <section class="trust-section">
+            <div class="trust-container">
+                <div class="trust-marker">
+                    <div class="trust-icon">🏥</div>
+                    <div class="trust-content">
+                        <h3>HIPAA Compliant</h3>
+                        <p>Standard Enforced</p>
+                    </div>
+                </div>
+
+                <div class="trust-marker">
+                    <div class="trust-icon">⚡</div>
+                    <div class="trust-content">
+                        <h3>Real-time Alerts</h3>
+                        <p>Zero Latency</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div style="max-width: 1536px; margin: 0 auto; padding: 40px 48px; border-top: 1px solid rgba(226, 232, 240, 0.15); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 8px;">MediVault</h3>
+                <p style="color: #64748b; font-size: 14px; margin: 0;">© 2026 MediVault Clinical Systems. All rights reserved.</p>
+            </div>
+            <div style="display: flex; gap: 32px; font-size: 14px; color: #64748b;">
+                <a href="#" style="color: inherit; text-decoration: none;">Privacy Policy</a>
+                <a href="#" style="color: inherit; text-decoration: none;">Terms of Service</a>
+                <a href="#" style="color: inherit; text-decoration: none;">HIPAA Compliance</a>
+                <a href="#" style="color: inherit; text-decoration: none;">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/Frontend/scripts/utils.js"></script>
+    <script src="/Frontend/scripts/auth.js"></script>
+</body>
+</html>
