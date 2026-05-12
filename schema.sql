@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS drug_conflicts (
   conflict_id INT AUTO_INCREMENT PRIMARY KEY,
   medicine_id INT NOT NULL,
   conflicting_medicine_id INT NOT NULL,
-  severity ENUM('low', 'moderate', 'high', 'contraindicated') NOT NULL DEFAULT 'moderate',
+  severity ENUM('low', 'moderate', 'high', 'contraindicated') NOT NULL,
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT uq_drug_conflict_pair UNIQUE (medicine_id, conflicting_medicine_id),
@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS order_statuses (
 CREATE TABLE IF NOT EXISTS orders (
   order_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
+  -- 1 = pending (seeded in order_statuses below)
   status_id TINYINT NOT NULL DEFAULT 1,
   prescription_upload_url VARCHAR(500),
   total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
@@ -116,7 +117,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   user_id INT NULL,
   action_type VARCHAR(80) NOT NULL,
   entity_type VARCHAR(80),
-  entity_id VARCHAR(80),
+  entity_id BIGINT,
   details TEXT,
   prescription_review_id INT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
