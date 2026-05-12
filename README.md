@@ -3,7 +3,7 @@ An inventory and ordering system for a local pharmacy or university health cente
 
 ## Database schema
 
-The project schema is defined in `/home/runner/work/MediVault/MediVault/schema.sql`.
+The project schema is defined in `schema.sql`.
 
 It includes:
 - admins (with `shop_banner_photo_url`)

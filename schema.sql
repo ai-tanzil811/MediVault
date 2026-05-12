@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS orders (
   order_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   status_id TINYINT NOT NULL DEFAULT 1,
-  prescription_upload_path VARCHAR(500),
+  prescription_upload_url VARCHAR(500),
   total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
