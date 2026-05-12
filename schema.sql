@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS drug_conflicts (
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT uq_drug_conflict_pair UNIQUE (medicine_id, conflicting_medicine_id),
-  CONSTRAINT chk_no_self_conflict CHECK (medicine_id <> conflicting_medicine_id),
   CONSTRAINT fk_drug_conflicts_medicine
     FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id)
     ON DELETE CASCADE ON UPDATE CASCADE,
