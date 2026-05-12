@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS orders (
   -- 1 = pending (seeded in order_statuses below)
   status_id TINYINT NOT NULL DEFAULT 1,
   prescription_upload_url VARCHAR(500),
-  total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
+  total_amount DECIMAL(22, 2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_orders_user
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS order_items (
   medicine_id INT NOT NULL,
   quantity INT NOT NULL CHECK (quantity > 0),
   unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
-  line_total DECIMAL(20, 2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+  line_total DECIMAL(22, 2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_order_items_order
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
