@@ -57,6 +57,48 @@ CREATE TABLE IF NOT EXISTS drug_conflicts (
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+DROP TRIGGER IF EXISTS trg_drug_conflicts_before_insert;
+DROP TRIGGER IF EXISTS trg_drug_conflicts_before_update;
+
+DELIMITER //
+CREATE TRIGGER trg_drug_conflicts_before_insert
+BEFORE INSERT ON drug_conflicts
+FOR EACH ROW
+BEGIN
+  IF NEW.medicine_id = NEW.conflicting_medicine_id THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A medicine cannot conflict with itself.';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM drug_conflicts
+    WHERE medicine_id = NEW.conflicting_medicine_id
+      AND conflicting_medicine_id = NEW.medicine_id
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Reverse duplicate drug conflict is not allowed.';
+  END IF;
+END//
+
+CREATE TRIGGER trg_drug_conflicts_before_update
+BEFORE UPDATE ON drug_conflicts
+FOR EACH ROW
+BEGIN
+  IF NEW.medicine_id = NEW.conflicting_medicine_id THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A medicine cannot conflict with itself.';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM drug_conflicts
+    WHERE medicine_id = NEW.conflicting_medicine_id
+      AND conflicting_medicine_id = NEW.medicine_id
+      AND conflict_id <> NEW.conflict_id
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Reverse duplicate drug conflict is not allowed.';
+  END IF;
+END//
+DELIMITER ;
+
 CREATE TABLE IF NOT EXISTS order_statuses (
   status_id TINYINT PRIMARY KEY,
   status_name VARCHAR(60) NOT NULL UNIQUE
@@ -85,7 +127,7 @@ CREATE TABLE IF NOT EXISTS order_items (
   medicine_id INT NOT NULL,
   quantity INT NOT NULL CHECK (quantity > 0),
   unit_price DECIMAL(10, 2) NOT NULL CHECK (unit_price >= 0),
-  line_total DECIMAL(12, 2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+  line_total DECIMAL(20, 2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_order_items_order
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
